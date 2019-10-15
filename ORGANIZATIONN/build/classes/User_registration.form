@@ -123,7 +123,7 @@
                                   <Group type="102" alignment="0" attributes="0">
                                       <EmptySpace min="4" pref="4" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                          <Component id="txtname" pref="188" max="32767" attributes="0"/>
+                                          <Component id="txtname1" pref="188" max="32767" attributes="0"/>
                                           <Component id="txtusername" alignment="0" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>
@@ -147,7 +147,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtname" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtname1" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -201,7 +201,7 @@
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
-            <Component class="javax.swing.JTextField" name="txtname">
+            <Component class="javax.swing.JTextField" name="txtname1">
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel4">
               <Properties>

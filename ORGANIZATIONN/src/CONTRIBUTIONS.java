@@ -24,6 +24,7 @@ import net.proteanit.sql.DbUtils;
  */
 public class CONTRIBUTIONS extends javax.swing.JFrame {
   Statement stmt;
+  String act;
   PreparedStatement pst;
   Connection conn;
   ResultSet rs;
@@ -42,10 +43,7 @@ public class CONTRIBUTIONS extends javax.swing.JFrame {
     }
      private void showtablecontributions(){
         try{
-//            String sql="SELECT membership.Name,contributions.Member_Id,contributions.Type,contributions.Description,contributions.Amount,contributions.Date,contributions.Rec_Id FROM membership,contributions WHERE membership.Rec_Id=contributions.Member_Id";
-//            String sql="select*from contributions";
-            String sql="SELECT (CONCAT(membership.Name,' , ',contributions.Member_Id))member,contributions.Type,contributions.Description,contributions.Amount,contributions.Date,contributions.Rec_Id FROM membership,contributions WHERE membership.Rec_Id=contributions.Member_Id ";
-//           String sql="select*from ccontributions";
+         String sql="select*from contributions";
             pst=conn.prepareStatement(sql);
             rs=pst.executeQuery();
             jTable1.setModel(DbUtils.resultSetToTableModel(rs));
@@ -56,8 +54,7 @@ public class CONTRIBUTIONS extends javax.swing.JFrame {
     }
      private void enter(){
          try{
-   String enter="insert into ccontributions(Member_and_member_id,Type,Description,Amount,Date)values(?,?,?,?,?)";
-// String enter="insert into contributions (Member_Id,Type,Description,Amount,Date) values(?,?,?,?,?)";
+ String enter="insert into contributions (Member_Id,Type,Description,Amount,Date) values(?,?,?,?,?)";
      pst=conn.prepareStatement(enter);
      String cmbmem=cmbmemberid.getSelectedItem().toString();
      pst.setString(1, cmbmem); 
@@ -73,18 +70,12 @@ public class CONTRIBUTIONS extends javax.swing.JFrame {
      }
       private void cmbmemerid(){
           try{
-////              String select="Select CONCAT(Name,'',Member_Id)AS ui from contributions";
-////           String select="select concat(Name,'',Member_Id)from membership,contributions where membership.Rec_Id=contributions.Member_Id";
-////              String select="select concat(Name,'',Member_Id)from membership,contributions where membership.Rec_Id=contributions.Member_Id";
-////              String select="select membership.Name,contributions.Member_Id from membership,contributions where Membership.Rec_Id=contributions.Member_Id";
-/////             String select="SELECT CONCAT(membership.Name,',',contributions.Member_Id)FROM membership,contributions WHERE membership.Rec_Id=contributions.Member_Id";
-//       String select="SELECT CONCAT(kontributions.Name,'  ,  ',kontributions.Member_Id )AS member from kontributions order by Member_Id";    
-              String select="select*From ccontributions";
+         String select="select*From membership";
                 pst=conn.prepareStatement(select);
                 pst.execute();
               rs=pst.executeQuery();
               while(rs.next()){
-                 String name=rs.getString("member");
+                 String name=rs.getString("Rec_Id");
                   cmbmemberid.addItem(name);  
 //                  String Member_Id=rs.getString("Member_Id");
 //                  cmbmemberid.addItem(Member_Id);
@@ -93,29 +84,6 @@ public class CONTRIBUTIONS extends javax.swing.JFrame {
               JOptionPane.showMessageDialog(null,ex);
              
           }
-          
-          
-          
-          
-          
-//      try{
-//          Statement stmt=(Statement)conn.createStatement();
-//      String select="SELECT CONCAT(Name,',',Member_Id)FROM membership,contributions WHERE membership.Rec_Id=contributions.Member_Id";
-////          String select="SELECT membership.Name,contributions.Member_Id FROM membership,contributions WHERE membership.Rec_Id=contributions.Member_Id";
-////          String select="select Rec_Id from membership";
-//          
-//          ResultSet rs=stmt.executeQuery(select);
-////          while(rs.next()){
-//////              String n=rs.getString("Name");
-//////              cmbmemberid.addItem(n);
-////              String memberid=rs.getString("Member_Id");
-////              cmbmemberid.addItem(memberid);
-////          }
-//
-//          
-//      }catch(Exception ex){
-//          JOptionPane.showMessageDialog(null,ex);
-//      }
  }
       private void reset(){
             try{
@@ -134,7 +102,7 @@ public class CONTRIBUTIONS extends javax.swing.JFrame {
           int ro=jTable1.getSelectedRow();
         String va=jTable1.getModel().getValueAt(ro,5).toString();
         int confirmdelete=JOptionPane.showConfirmDialog(null, "Do you really want to delete this row?","Delete",JOptionPane.YES_NO_OPTION);
-       String delete="delete from ccontributions where Rec_Id='"+Integer.parseInt(va)+"'";
+       String delete="delete from contributions where Rec_Id='"+Integer.parseInt(va)+"'";
         try{
             pst=conn.prepareStatement(delete);
             pst.execute();
@@ -167,14 +135,15 @@ public class CONTRIBUTIONS extends javax.swing.JFrame {
               
       }
       private void mouseclicked(){
+          act="en";
           try{
               int ro=jTable1.getSelectedRow();
               String va=jTable1.getModel().getValueAt(ro,5).toString();
-              String select="select*from ccontributions where Rec_Id='"+Integer.parseInt(va)+"'";
+              String select="select*from contributions where Rec_Id='"+Integer.parseInt(va)+"'";
               pst=conn.prepareStatement(select);
               rs=pst.executeQuery();
               if(rs.next()){
-                    String add1=rs.getString("member");
+                    String add1=rs.getString("member_Id");
                   cmbmemberid.setSelectedItem(add1);
                   String add2=rs.getString("Type");
                   cmbtype.setSelectedItem(add2);
@@ -196,6 +165,37 @@ public class CONTRIBUTIONS extends javax.swing.JFrame {
          jTable1.setRowSorter(tr);
          tr.setRowFilter(javax.swing.RowFilter.regexFilter(query));
      }
+       private void editorupdate(){
+            try{
+           if((!(act=="en"))){
+           stmt = (Statement) conn.createStatement();
+           Member_Id=cmbmemberid.getSelectedItem().toString();
+           type=cmbtype.getSelectedItem().toString();
+           description=txtdescription.getText();
+           amount=txtmount.getText();
+           String d=((JTextField)jDateChoosercontributions.getDateEditor().getUiComponent()).getText();
+           String sql="insert into contributions(Member_Id,Type,Description,Amount,Date)values('"+Member_Id+"','"+type+"','"+description+"','"+amount+"','"+d+"')";
+         stmt.executeUpdate(sql);
+         showtablecontributions();
+           } 
+            else{
+          int ro=jTable1.getSelectedRow();
+         String va=jTable1.getValueAt(jTable1.getSelectedRow(), 5).toString();
+         stmt = (Statement) conn.createStatement();
+           Member_Id=cmbmemberid.getSelectedItem().toString();
+           type=cmbtype.getSelectedItem().toString();
+           description=txtdescription.getText();
+           amount=txtmount.getText();
+           String d=((JTextField)jDateChoosercontributions.getDateEditor().getUiComponent()).getText(); 
+         String update="update  `contributions`set`Member_Id`='"+Member_Id+"',`Type`='"+type+"',`Description`='"+description+"',`Amount`='"+amount+"',`Date`='"+d+"'where Rec_Id='"+Integer.parseInt(va)+"'";
+         stmt.executeUpdate(update);
+         showtablecontributions();
+         JOptionPane.showMessageDialog(null,"row updated");
+                   }
+        }catch(Exception ex){
+            JOptionPane.showMessageDialog(null,ex);
+        }
+       }
      
 /**
      * This method is called from within the constructor to initialize the form.
@@ -524,7 +524,8 @@ public class CONTRIBUTIONS extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         try{
-            enter();
+            editorupdate();
+//            enter();
             showtablecontributions();
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
@@ -537,7 +538,7 @@ public class CONTRIBUTIONS extends javax.swing.JFrame {
 
     private void jtextfieldsearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtextfieldsearchKeyReleased
         // TODO add your handling code here:
-//        DefaultTableModel dm=(DefaultTableModel)
+//    
     }//GEN-LAST:event_jtextfieldsearchKeyReleased
 
     /**

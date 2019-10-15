@@ -144,17 +144,17 @@ public class Doctor_registration extends javax.swing.JFrame {
             String sql=("select MAX(Doctor_No)from doctorregistration");
             Statement stmt=conn.createStatement();
             rs=stmt.executeQuery(sql);
-            rs.next();
+            //rs.next();
             rs.getString("MAX(Doctor_No)");
             if(rs.getString("MAX(Doctor_No)")==null){
                 jdoctorno.setText("DS001");
       }
-            else{
-                Long Id=Long.parseLong(rs.getString("MAX(Doctor_No)").substring(2,rs.getString("MAX(Doctor_No)").length()));
-//                Long Id=Long.parseLong(rs.getString(rs.getString("MAX(Patient_No)").substring(2,rs.getString("MAX(Patient_No)").length())));
-                  Id++;
-               jdoctorno.setText("DS"+String.format("%03d",Id));    
-          }
+//            else{
+//                Long Id=Long.parseLong(rs.getString("MAX(Doctor_No)").substring(2,rs.getString("MAX(Doctor_No)").length()));
+////                Long Id=Long.parseLong(rs.getString(rs.getString("MAX(Patient_No)").substring(2,rs.getString("MAX(Patient_No)").length())));
+//                  Id++;
+//               jdoctorno.setText("DS"+String.format("%03d",Id));    
+//          }
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
         }

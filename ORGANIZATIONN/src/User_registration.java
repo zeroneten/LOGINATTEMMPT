@@ -3,6 +3,7 @@ import com.mysql.jdbc.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -24,12 +25,18 @@ public class User_registration extends javax.swing.JFrame {
   Connection conn;
   ResultSet rs;
   String Profile;
+  String act,name,username,profile,password,confirm_password;
     /**
      * Creates new form User_registration
      */
     public User_registration() {
         initComponents();
        conn=Dbconnection.Dbconnection(); 
+       
+          Date d=new Date();
+        SimpleDateFormat s=new SimpleDateFormat("yyyy-MM-dd");
+        jDateChooseruserregistration.setDate(d);
+      
        showusertable();
     }
     private void showusertable(){
@@ -47,7 +54,7 @@ public class User_registration extends javax.swing.JFrame {
             String sql="insert into user_registration(Name,Username,Profile,Date,Password,Confirm_password)values(?,?,?,?,?,?)";
 //            String sql="insert into `user_registration`(`Name`,`Username`,`Profile`,Password`,`Confirm_password`,`Date`)values(?,?,?,?,?,?)";
             pst=conn.prepareStatement(sql);
-            pst.setString(1,txtname.getText());
+            pst.setString(1,txtname1.getText());
             pst.setString(2,txtusername.getText());
             String cmbp=cmbprofile.getSelectedItem().toString();
             pst.setString(3, cmbp);
@@ -62,7 +69,7 @@ public class User_registration extends javax.swing.JFrame {
     }
     private void resetfields(){
         try{
-            txtname.setText(null);
+            txtname1.setText(null);
             txtusername.setText(null);
             cmbprofile.setSelectedIndex(0);
             jDateChooseruserregistration.setDate(null);
@@ -77,12 +84,12 @@ public class User_registration extends javax.swing.JFrame {
          int ro=jTable1.getSelectedRow();
          String va=jTable1.getModel().getValueAt(ro, 6).toString();
         try{
-           String va1=txtname.getText();
+           String va1=txtname1.getText();
            String va2=txtusername.getText();
-           Profile=cmbprofile.getSelectedItem().toString();
+       String Profile=cmbprofile.getSelectedItem().toString();
            String va3=jPasswordField.getText();
            String va4=jPasswordFieldconfirm.getText();
-           String sql="update user_registration set Name='"+va1+"','"+va2+"','"+va3+"','"+va4+"'where Rec_Id='"+Integer.parseInt(va)+"'";
+           String sql="update user_registration set Name='"+va1+"',Username='"+va2+"',Profile='"+Profile+"',Password='"+va3+"',Confirm_password='"+jPasswordFieldconfirm+"' where Rec_Id='"+Integer.parseInt(va)+"'";
            pst=conn.prepareStatement(sql);
            pst.execute();
            showusertable();
@@ -95,15 +102,17 @@ public class User_registration extends javax.swing.JFrame {
             int ro=jTable1.getSelectedRow();
             String va=jTable1.getModel().getValueAt(ro,6).toString();
               int confirmdelete=JOptionPane.showConfirmDialog(null, "Do you really want to delete this row?","Delete",JOptionPane.YES_NO_OPTION);
-          String delete="delete from user_registration where Rec_Id='"+Integer.parseInt(va)+"'";
-           pst=conn.prepareStatement(va);
+          if(confirmdelete==0){
+              String delete="delete from user_registration where Rec_Id='"+Integer.parseInt(va)+"'";
+           pst=conn.prepareStatement(delete);
            pst.execute();
-           showusertable();
+           showusertable();}
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
         }
     }
     private void mouseclicked(){
+         act="en";
         try{
             int ro=jTable1.getSelectedRow();
             String va=jTable1.getModel().getValueAt(ro, 6).toString();
@@ -112,7 +121,7 @@ public class User_registration extends javax.swing.JFrame {
             rs=pst.executeQuery();
             if(rs.next()){
                 String Name=rs.getString("Name");
-                txtname.setText(Name);
+                txtname1.setText(Name);
                 String Username=rs.getString("Username");
                 txtusername.setText(Username);
                 String profile=rs.getString("Profile");
@@ -124,8 +133,102 @@ public class User_registration extends javax.swing.JFrame {
                 String cp=rs.getString("Confirm_password");
                 jPasswordFieldconfirm.setText(p);
                 pst.execute();
-                showusertable();
+                
             }
+        }catch(Exception ex){
+            JOptionPane.showMessageDialog(null,ex);
+        }
+    }
+    private void inserorupdtate(){
+             try{
+               if((!(act=="en"))){
+                            stmt = (Statement) conn.createStatement();
+                            name=txtname1.getText();
+                            username=txtusername.getText();
+                            profile=cmbprofile.getSelectedItem().toString();
+                            String d=((JTextField)jDateChooseruserregistration.getDateEditor().getUiComponent()).getText();
+                            password=jPasswordFieldconfirm.getText();
+                            confirm_password=jPasswordFieldconfirm.getText();
+                            String sql="insert into user_registration(Name,Username,Profile,Date,Password,Confirm_password)values('"+name+"','"+username+"','"+profile+"','"+d+"','"+password+"','"+confirm_password+"')";
+                          stmt.executeUpdate(sql);
+                          showusertable();
+                            } 
+                             else{
+                           int ro=jTable1.getSelectedRow();
+                          String va=jTable1.getValueAt(jTable1.getSelectedRow(), 6).toString();
+                          stmt = (Statement) conn.createStatement();
+                          name=txtname1.getText();
+                          username=txtusername.getText();
+                          profile=cmbprofile.getSelectedItem().toString();
+                          String d=((JTextField)jDateChooseruserregistration.getDateEditor().getUiComponent()).getText();
+                          password=jPasswordField.getText();
+                          confirm_password=jPasswordFieldconfirm.getText();
+                          String update="update  `user_registration`set`Name`='"+name+"',`Username`='"+username+"',`Profile`='"+profile+"',`Date`='"+d+"',`Password`='"+password+"',`Confirm_password`='"+confirm_password+"'where Rec_Id='"+Integer.parseInt(va)+"'";
+                          stmt.executeUpdate(update);
+                          showusertable();
+                          JOptionPane.showMessageDialog(null,"row updated");
+                                    }     
+             }catch(Exception ex){
+                 JOptionPane.showMessageDialog(null,ex);
+             }
+
+        
+        
+    }
+   private void setenableduserregistration(){
+         try{
+             txtname1.setEnabled(true);
+            txtusername.setEnabled(true);
+            cmbprofile.setEnabled(true);
+           jDateChooseruserregistration.setEnabled(true);
+            jPasswordField.setEnabled(true);
+            jPasswordFieldconfirm.setEnabled(true);
+        }catch(Exception ex){
+            JOptionPane.showMessageDialog(null,ex);
+        }
+    }
+    private void setDisableduserregistration(){
+        try{
+            txtname1.setEnabled(false);
+            txtusername.setEnabled(false);
+            cmbprofile.setEnabled(false);
+           jDateChooseruserregistration.setEnabled(false);
+            jPasswordField.setEnabled(false);
+            jPasswordFieldconfirm.setEnabled(false);
+            
+        }catch(Exception ex){
+            JOptionPane.showMessageDialog(null,ex);
+        }
+    }
+     private void insertorupdateuserregistration(){
+        try{
+           if((!(act=="en"))){
+           stmt = (Statement) conn.createStatement();
+           name=txtname1.getText();
+           username=txtusername.getText();
+           profile=cmbprofile.getSelectedItem().toString();
+           String d=((JTextField)jDateChooseruserregistration.getDateEditor().getUiComponent()).getText();
+           password=jPasswordFieldconfirm.getText();
+           confirm_password=jPasswordFieldconfirm.getText();
+           String sql="insert into user_registration(Name,Username,Profile,Date,Password,Confirm_password)values('"+name+"','"+username+"','"+profile+"','"+d+"','"+password+"','"+confirm_password+"')";
+         stmt.executeUpdate(sql);
+         showusertable();
+           } 
+            else{
+          int ro=jTable1.getSelectedRow();
+         String va=jTable1.getValueAt(jTable1.getSelectedRow(), 6).toString();
+         stmt = (Statement) conn.createStatement();
+         name=txtname1.getText();
+         username=txtusername.getText();
+         profile=cmbprofile.getSelectedItem().toString();
+         String d=((JTextField)jDateChooseruserregistration.getDateEditor().getUiComponent()).getText();
+         password=jPasswordField.getText();
+         confirm_password=jPasswordFieldconfirm.getText();
+         String update="update  `user_registration`set`Name`='"+name+"',`Username`='"+username+"',`Profile`='"+profile+"',`Date`='"+d+"',`Password`='"+password+"',`Confirm_password`='"+confirm_password+"'where Rec_Id='"+Integer.parseInt(va)+"'";
+         stmt.executeUpdate(update);
+         showusertable();
+         JOptionPane.showMessageDialog(null,"row updated");
+                   }
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
         }
@@ -141,8 +244,8 @@ public class User_registration extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        cmbprofile = new javax.swing.JComboBox<>();
-        txtname = new javax.swing.JTextField();
+        cmbprofile = new javax.swing.JComboBox<String>();
+        txtname1 = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
@@ -171,7 +274,7 @@ public class User_registration extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(255, 204, 204));
         jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 255, 51), new java.awt.Color(255, 153, 204), new java.awt.Color(51, 0, 0), new java.awt.Color(0, 204, 153)));
 
-        cmbprofile.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Admin", "Super admin", "User" }));
+        cmbprofile.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Admin", "Super admin", "User" }));
 
         jLabel4.setText("Password");
 
@@ -222,7 +325,7 @@ public class User_registration extends javax.swing.JFrame {
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(4, 4, 4)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtname, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+                                    .addComponent(txtname1, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
                                     .addComponent(txtusername)))
                             .addComponent(cmbprofile, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -238,7 +341,7 @@ public class User_registration extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel1)
-                    .addComponent(txtname, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtname1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
@@ -437,8 +540,8 @@ public class User_registration extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         try{
-            insert();
-            JOptionPane.showMessageDialog(null,"inserted");
+        inserorupdtate();
+//            insert();
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
         }
@@ -456,9 +559,9 @@ public class User_registration extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
         try{
-            editorupdate();
-            JOptionPane.showMessageDialog(null,"record updated");
-            showusertable();
+            setenableduserregistration();
+//            editorupdate();
+//            showusertable();
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
         }
@@ -468,7 +571,7 @@ public class User_registration extends javax.swing.JFrame {
         // TODO add your handling code here:
         try{
             mouseclicked();
-            showusertable();
+            setDisableduserregistration();
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
         }
@@ -557,7 +660,7 @@ public class User_registration extends javax.swing.JFrame {
     private javax.swing.JPasswordField jPasswordFieldconfirm;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField txtname;
+    private javax.swing.JTextField txtname1;
     private javax.swing.JTextField txtusername;
     // End of variables declaration//GEN-END:variables
 }

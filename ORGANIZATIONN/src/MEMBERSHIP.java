@@ -20,6 +20,7 @@ import net.proteanit.sql.DbUtils;
  * @author ndirituedwin
  */
 public class MEMBERSHIP extends javax.swing.JFrame {
+    String act;
 Connection conn=null;
 PreparedStatement pst=null;
 Statement stmt=null;
@@ -42,11 +43,7 @@ int ro;
     }
     private void showTableMembership(){
         try{
-       String sql="SELECT (CONCAT(groups.Group_Name, ' ,' ,groups.Rec_Id))groupname,membership.Name,membership.Id_No,membership.Tel_No,membership.Date,membership.Rec_Id FROM groups,membership WHERE groups.Rec_Id=membership.Group_Id ORDER BY Rec_Id ";
-//          String sql="select*from membershipgroups";  
-//      String sql="SELECT (CONCAT(groups.Group_Name, ', ' ,membership.Group_Id))group_name,membership.Name,membership.Id_No,membership.Tel_No,membership.Date,membership.Rec_Id FROM groups,membership WHERE GROUPS.Rec_Id=membership.Group_Id ORDER By Group_Id "; 
-//           String sql="SELECT groups.Group_Name,membership.Name,membership.Id_No,membership.Tel_No,membership.Date,membership.Rec_Id FROM groups,membership WHERE groups.Rec_Id=membership.Group_Id ";
-//            String sql="select*from membership";
+           String sql="select*from membership";
             pst=conn.prepareStatement(sql);
             rs=pst.executeQuery();
             jTable1.setModel(DbUtils.resultSetToTableModel(rs));
@@ -58,13 +55,12 @@ int ro;
     private void cmbgroupid(){
         try{
 //            String sql="select *from membership";
-        String sql="select*from membershipgroups";
-//      String sql="select Rec_Id from groups";
+      String sql="select Rec_Id from groups";
             pst=conn.prepareStatement(sql);
             rs=pst.executeQuery();
             while(rs.next()){
-                String group_name=rs.getString("group_name");
-                cmbgroupid.addItem(group_name);
+                String Rec_id=rs.getString("Rec_Id");
+                cmbgroupid.addItem(Rec_id);
             }            
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
@@ -73,8 +69,7 @@ int ro;
     private void enter(){
         try{
             
-    String sql="insert into membershipgroups(group_name,Name,Id_No,Tel_No,Date)values(?,?,?,?,?)";
-//           String sql="insert into membership(`Group_Id`,`Name`,`Id_No`,`Tel_No`,`Date`)values (?,?,?,?,?)";
+           String sql="insert into membership(`Group_Id`,`Name`,`Id_No`,`Tel_No`,`Date`)values (?,?,?,?,?)";
 //            String insert="insert into membership(Group_Id,Name,Id_No,Tel_No,Date)values(?,?,?,?,?)";
             pst=conn.prepareStatement(sql);
             String value=cmbgroupid.getSelectedItem().toString();
@@ -95,8 +90,8 @@ int ro;
         try{
             int ro=jTable1.getSelectedRow();
             String va=jTable1.getModel().getValueAt(ro, 5).toString();
-            int confirmdelete=JOptionPane.showConfirmDialog(null,"Doyou really want to delete this row?","Delete",JOptionPane.YES_NO_OPTION);
-            String delete="delete from membershipgroups where Rec_Id='"+Integer.parseInt(va)+"'";
+            int confirmdelete=JOptionPane.showConfirmDialog(null,"Do you really want to delete this row?","Delete",JOptionPane.YES_NO_OPTION);
+            String delete="delete from membership where Rec_Id='"+Integer.parseInt(va)+"'";
             pst=conn.prepareStatement(delete);
             pst.execute();
             showTableMembership();
@@ -117,17 +112,15 @@ int ro;
         }
     }
     private void mouseclicked(){
+        act="en";
         try{
             int ro=jTable1.getSelectedRow();
             String va=jTable1.getModel().getValueAt(ro,5).toString();
-            String sql="select*from membershipgroups where Rec_Id='"+Integer.parseInt(va)+"'";
-//       String sql="SELECT (CONCAT(groups.Group_Name, ', ' ,membership.Group_Id))group_name,membership.Name,membership.Id_No,membership.Tel_No,membership.Date,membership.Rec_Id FROM groups,membership WHERE GROUPS.Rec_Id=membership.Group_Id ORDER By Rec_Id "; 
-           
-//            String sql="select*from membership where Rec_Id='"+va+"'";
+            String sql="select*from membership where Rec_Id='"+Integer.parseInt(va)+"'";
             pst=conn.prepareStatement(sql);
             rs=pst.executeQuery();
             if(rs.next()){
-                String add1=rs.getString("group_name");
+                String add1=rs.getString("group_Id");
                 cmbgroupid.setSelectedItem(add1);
                 String add2=rs.getString("Name");
                 txtname.setText(add2);
@@ -152,7 +145,7 @@ int ro;
         String val3=txtidno.getText();
         String val4=txttelno.getText();
 //            jDateChoosermembership.getDate();
-            String edit="update membershipgroups set Group_name='"+val1+"',Name='"+val2+"',Id_No='"+val3+"',Tel_No='"+val4+"'where Rec_Id='"+Integer.parseInt(va)+"'";
+            String edit="update membership set Group_Id='"+val1+"',Name='"+val2+"',Id_No='"+val3+"',Tel_No='"+val4+"'where Rec_Id='"+Integer.parseInt(va)+"'";
             pst=conn.prepareStatement(edit);
             pst.execute();
             JOptionPane.showMessageDialog(null,"updated");
@@ -161,6 +154,53 @@ int ro;
             JOptionPane.showMessageDialog(null,ex);
         }
         
+    }
+    private void inserorupdaete(){
+         try{
+           if((!(act=="en"))){
+           stmt = (com.mysql.jdbc.Statement) conn.createStatement();
+           Group_Id=cmbgroupid.getSelectedItem().toString();
+           Name=txtname.getText();
+           Id_No=txtidno.getText();
+           Tel_No=txttelno.getText();
+           String d=((JTextField)jDateChoosermembership.getDateEditor().getUiComponent()).getText();
+           String sql="insert into membership(Group_Id,Name,Id_No,Tel_No,Date)values('"+Group_Id+"','"+Name+"','"+Id_No+"','"+Tel_No+"','"+d+"')";
+         stmt.executeUpdate(sql);
+         showTableMembership();
+           } 
+            else{
+          int ro=jTable1.getSelectedRow();
+         String va=jTable1.getValueAt(jTable1.getSelectedRow(), 5).toString();
+         stmt = (com.mysql.jdbc.Statement) conn.createStatement();
+         Group_Id=cmbgroupid.getSelectedItem().toString();
+           Name=txtname.getText();
+           Id_No=txtidno.getText();
+           Tel_No=txttelno.getText();
+           String d=((JTextField)jDateChoosermembership.getDateEditor().getUiComponent()).getText();
+       
+           String update="update  `membership`set`Group_Id`='"+Group_Id+"',`Name`='"+Name+"',`Id_No`='"+Id_No+"',`Tel_No`='"+Tel_No+"',`Date`='"+d+"'where Rec_Id='"+Integer.parseInt(va)+"'";
+         stmt.executeUpdate(update);
+         showTableMembership();
+         JOptionPane.showMessageDialog(null,"row updated");
+                   }
+        }catch(Exception ex){
+            JOptionPane.showMessageDialog(null,ex);
+        }
+    }
+    private void setenabled(){
+        cmbgroupid.setEnabled(true);
+        txtname.setEnabled(true);
+        txtidno.setEnabled(true);
+        txttelno.setEnabled(true);
+        jDateChoosermembership.setEnabled(true);
+
+    }
+    private void setdisabled(){
+     cmbgroupid.setEnabled(false);
+        txtname.setEnabled(false);
+        txtidno.setEnabled(false);
+        txttelno.setEnabled(false);
+        jDateChoosermembership.setEnabled(false);
     }
     
     /**
@@ -438,7 +478,8 @@ int ro;
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
           try{
-            enter();
+              inserorupdaete();
+//            enter();
   
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
@@ -456,8 +497,8 @@ int ro;
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
-        editorupdate();
-        showTableMembership();
+//        editorupdate();
+        setenabled();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -475,6 +516,7 @@ int ro;
          // TODO add your handling code here:
         try{
             mouseclicked();
+            setdisabled();
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
         }

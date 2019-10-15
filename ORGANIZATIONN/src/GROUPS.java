@@ -1,10 +1,13 @@
 
 import com.mysql.jdbc.Statement;
+import java.awt.Component;
+import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
@@ -27,8 +30,10 @@ Connection conn=null;
 ResultSet rs=null;
  PreparedStatement pst=null;
 Statement stmt;
-String Group_Name,activity="",Location,Date;
+String Group_Name,Location,activity="",Date;
+ 
 int ro;
+ String act;
 Date d;
     /**
      * Creates new form GROUPS
@@ -291,6 +296,54 @@ Date d;
              JOptionPane.showMessageDialog(null,ex);
          }
      }
+     private void cliar(){
+    try{
+JTextField clear=null;
+for(Component c:jPanel3.getComponents()){
+    if(c.getClass().toString().contains("javax.swing.JTextField")){
+        clear=(JTextField)c;
+        clear.setText(null);
+        jDateChoosergroups.setDate(null);
+    }
+}
+    }catch(Exception ex){
+        JOptionPane.showMessageDialog(null,ex);
+    }
+}
+
+     private void switc(){
+    try{
+     if((!(act=="JHgf"))){
+         stmt = (Statement) conn.createStatement();
+        Group_Name=txtgroupname.getText();
+        Group_Name = Group_Name.substring(0,1).toUpperCase() + Group_Name.substring(1).toLowerCase();  
+         Location=txtlocation.getText();
+          Location = Location.substring(0,1).toUpperCase() + Location.substring(1).toLowerCase();  
+         String d=((JTextField)jDateChoosergroups.getDateEditor().getUiComponent()).getText();
+         String insert="insert into `groups`(`Group_Name`,`Location`,`Date`)values('"+Group_Name+"','"+Location+"','"+d+"')";
+         stmt.executeUpdate(insert);
+         JOptionPane.showMessageDialog(null,"row inserted");
+     }
+     else {
+         int ro=jTable1.getSelectedRow();
+         String va=jTable1.getValueAt(jTable1.getSelectedRow(), 3).toString();
+         stmt = (Statement) conn.createStatement();
+         Group_Name=txtgroupname.getText();
+         Location=txtlocation.getText();
+//          da=jDateChoosergroups.getDateFormatString();
+         String d=((JTextField)jDateChoosergroups.getDateEditor().getUiComponent()).getText();
+         String update="update  `groups`set`Group_Name`='"+Group_Name+"',`Location`='"+Location+"',`Date`='"+d+"' where Rec_Id='"+Integer.parseInt(va)+"'";
+         stmt.executeUpdate(update);
+         showtablegroups();
+         JOptionPane.showMessageDialog(null,"row updated");
+         
+     }
+        
+        
+    }catch(Exception ex){
+        JOptionPane.showMessageDialog(null,ex);
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -320,6 +373,7 @@ Date d;
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -343,6 +397,14 @@ Date d;
                 jTable1MouseClicked(evt);
             }
         });
+        jTable1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTable1KeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTable1KeyReleased(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -364,7 +426,19 @@ Date d;
 
         jLabel1.setText("Group_Name");
 
+        txtgroupname.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtgroupnameKeyPressed(evt);
+            }
+        });
+
         jLabel2.setText("Location");
+
+        txtlocation.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtlocationKeyPressed(evt);
+            }
+        });
 
         jDateChoosergroups.setDateFormatString("yyyy-MM-dd");
 
@@ -470,7 +544,7 @@ Date d;
             }
         });
 
-        jButton5.setText("Save");
+        jButton5.setText("update");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
@@ -501,6 +575,13 @@ Date d;
                 .addContainerGap())
         );
 
+        jButton6.setText("Exit");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -518,6 +599,8 @@ Date d;
                 .addComponent(jButton2)
                 .addGap(57, 57, 57)
                 .addComponent(jButton4)
+                .addGap(62, 62, 62)
+                .addComponent(jButton6)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -533,11 +616,13 @@ Date d;
                         .addGap(14, 14, 14)
                         .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton4))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton2)))
+                        .addComponent(jButton2))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton6)
+                            .addComponent(jButton4))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -565,11 +650,12 @@ Date d;
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         try{
+            switc();
             
 //             saveorupdate();
 //            enter();
 //            insertorupdate();
-            enteer();
+//            enteer();
               showtablegroups();
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
@@ -581,9 +667,10 @@ Date d;
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
         try{
-            reset();
-            jButton1.setVisible(true);
-            jButton5.setVisible(false);
+            cliar();
+//            reset();
+//            jButton1.setVisible(true);
+//            jButton5.setVisible(false);
 //            jButton5.setVisible(false);
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null,ex);
@@ -614,7 +701,7 @@ Date d;
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         // TODO add your handling code here:
-         
+         act="JHgf";
         int ro=jTable1.getSelectedRow();
         String va=(jTable1.getModel().getValueAt(ro,3).toString());
         String sql="select*from groups where Rec_Id='"+Integer.parseInt(va)+"'";
@@ -629,10 +716,9 @@ Date d;
                 Date d=rs.getDate("Date");
                 jDateChoosergroups.setDate(d);
                 setedisabled();
-                jButton1.setVisible(false);
-                jButton5.setVisible(true);
-//              jButton1.setEnabled(false);
-//                jButton5.setEnabled(true);
+//                jButton1.setVisible(false);
+//             jButton5.setVisible(true);
+//              
             } 
             
             
@@ -651,16 +737,87 @@ Date d;
 
     private void jTextField1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyPressed
         // TODO add your handling code here:
+       
+          
+         
     }//GEN-LAST:event_jTextField1KeyPressed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         // TODO add your handling code here:
         try{
-            uppdate();
+//            uppdate();
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null, ex);
         }
     }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void txtgroupnameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtgroupnameKeyPressed
+        // TODO add your handling code here:
+        try{
+            if(evt.getKeyCode()==KeyEvent.VK_ENTER){
+                txtlocation.requestFocus();
+            }
+        }catch(Exception ex){
+            JOptionPane.showMessageDialog(null,ex);
+        }
+    }//GEN-LAST:event_txtgroupnameKeyPressed
+
+    private void txtlocationKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtlocationKeyPressed
+        // TODO add your handling code here:
+        try{
+            if(evt.getKeyCode()==KeyEvent.VK_ENTER){
+                jDateChoosergroups.requestFocus();
+            }
+        }catch(Exception ex){
+            JOptionPane.showMessageDialog(null,ex);
+        }
+    }//GEN-LAST:event_txtlocationKeyPressed
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // TODO add your handling code here:
+        if(JOptionPane.showConfirmDialog(null,"Do you really want to exit","exit",JOptionPane.YES_NO_OPTION)==JOptionPane.YES_NO_OPTION){
+        System.exit(0);
+    }
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
+        // TODO add your handling code here:
+        if(evt.getKeyCode()==KeyEvent.VK_ENTER){
+            
+            
+        }
+       
+    }//GEN-LAST:event_jTable1KeyPressed
+
+    private void jTable1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyReleased
+        // TODO add your handling code here:
+         if((evt.getKeyCode()==KeyEvent.VK_DOWN)||(evt.getKeyCode()==KeyEvent.VK_UP)){
+         
+//               txtgroupname.requestFocus();
+                act="JHgf";
+        int ro=jTable1.getSelectedRow();
+        String va=(jTable1.getModel().getValueAt(ro,3).toString());
+        String sql="select*from groups where Rec_Id='"+Integer.parseInt(va)+"'";
+        try{
+            pst=conn.prepareStatement(sql);
+            rs=pst.executeQuery();
+            if(rs.next()){
+                String gro=rs.getString("Group_Name");
+                txtgroupname.setText(gro);
+                String loca=rs.getString("Location");
+                txtlocation.setText(loca); 
+                Date d=rs.getDate("Date");
+                jDateChoosergroups.setDate(d);
+//                setedisabled();
+//                jButton1.setVisible(false);
+//             jButton5.setVisible(true);
+//              
+            } 
+       
+            
+        }catch(Exception ex){
+            JOptionPane.showMessageDialog(null,ex);
+        } }
+    }//GEN-LAST:event_jTable1KeyReleased
     /**
      * @param args the command line arguments
      */
@@ -702,6 +859,7 @@ Date d;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private com.toedter.calendar.JDateChooser jDateChoosergroups;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
